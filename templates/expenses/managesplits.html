@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container-fluid" id="managesplits">
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
+    {% endif %}
+    <div class="container mt-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'createsplit' %}">Bill Split</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">View Bills</li>
+    </ol>
+  </nav>
+    <div class="">
+      <h4>Your ledger: </h4>
+      <p>Your total spendings:  {{totalspendings}}</p>
+      <table class="table table-bordered table-hover" style="max-width: 400px">
+        <thead>
+          <th>Member</th>
+          <th>Pay / Receive</th>
+        </thead>
+        <tbody>
+          {% for key,value in amount.items %}
+            <tr>
+              <td>{{key}}</td>
+              {% load mathfilters %}
+              {% if value < 0 %}
+                <td style="color: red">  {{value|abs}}</td>
+              {% else %}
+                <td style="color:green">  {{value}}</td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+        <a href="{% url 'addsplittrans' id %}"><button class="btn btn-dark">Add Transaction</button></a><br>
+      <!-- <p><span style="color:red">Red</span>: You have to pay</p>
+      <p><span style="color:green">Green</span> You will receive</p> -->
+    </div>
+    <hr>
+    <form action="" method="POST" id="addmemberform">
+        {% csrf_token %}
+        <p style="font-weight: bold">Add members to the group:</p>
+        <div class="form-group row" style="margin:0px">
+            <label for="username" class="col-form-label">Username:</label>
+            <div class="col-lg-4">
+                <input type="text" name="username" required class="form-control">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline-info">Submit</button>
+    </form>
+
+    <hr>
+    <h5>Members:</h5>
+    <ul id="members_list" class="list-unstyled">
+        {% for member in members %}
+            <li><input type="text" value="{{member.username}}" name="member" id="member" hidden> {{member.username}}
+              <a href="{% url 'deletemember' member.id %}"
+        ><i class="fas fa-times"></i></a>
+      </li>
+        {% endfor %}
+    </ul>
+  
+    {% endblock %}
+    {% block script %}
+    <script>
+        $("[id='deletemember']").on('click',function(){
+            var member = $(this).closest('li').find('input').val();
+            $.ajax({
+              url: '{% url 'deletemember' %}',
+              method: 'GET',
+              data: {
+                'username': member,
+                'splitid': {{id}},
+              },
+              success: function(data){
+                $('#members_list').html(data);
+              }
+            })
+    </script>
+    {% endblock %}
+</div>

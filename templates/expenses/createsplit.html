@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block body %}
+{% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{message}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+  {% endfor %}
+{% endif %}
+<div class="container mt-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'createsplit' %}">Bill Splitt</a>
+    </ol>
+  </nav>
+<div class="container-fluid" id="createsplit">
+    <form action="{% url 'createsplit' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group col-lg-4">
+            <label for="groupname"> <h3>Group name</h3></label>
+            <input type="text" name="groupname" class="form-control">
+        </div>
+        <button type="submit" id="submitexpense" class="btn btn-outline-primary">Submit</button>
+    </form>
+    <hr>
+    <h4>Your groups:</h4>
+    <ul id="" class="list-unstyled">
+        {% for group in groups %}
+            <li><a href="{% url 'managesplits' group.splitid_id %}">{{group.splitid.name}}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}
